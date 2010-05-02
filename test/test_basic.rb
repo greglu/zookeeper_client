@@ -1,6 +1,8 @@
-HERE = File.expand_path(File.dirname(__FILE__))
+#$LOAD_PATH << '/home/eric/zk-clients/lib'
+require 'rubygems'
 
-require "#{HERE}/../lib/zookeeper"
+$LOAD_PATH.unshift( File.join(File.dirname(__FILE__), "..", "lib") )
+require 'zookeeper_jruby'
 
 z = Zookeeper.new("localhost:2181")
 
@@ -20,7 +22,7 @@ unless stat.nil?
   puts "delete: #{z.delete(path, stat.version).inspect}"
 end
 
-puts "create: #{z.create(path, "initial value", 0).inspect}"
+puts "create: #{z.create(path, "initial value", Zookeeper::EPHEMERAL).inspect}"
 
 value, stat = z.get(path)
 puts "current value #{value}, stat #{stat.inspect}"
@@ -32,32 +34,30 @@ puts "new value: #{value.inspect} #{stat.inspect}"
 
 puts "delete: #{z.delete(path, stat.version).inspect}"
 
-begin
-  puts "exists? #{z.exists(path)}"
-  raise Exception, "it shouldn't exist"
-rescue Zookeeper::NoNodeError
-  puts "doesn't exist - good, because we just deleted it!"
-end
+#begin
+#  puts "exists? #{z.exists(path)}"
+#  raise Exception, "it shouldn't exist"
+#rescue ZooKeeper::NoNodeError
+#  puts "doesn't exist - good, because we just deleted it!"
+#end
 
 puts "trying a watcher"
 puts z
 if s = z.stat("/test"); z.delete("/test", s.version); end
-z.create("/test", "foo", 0)
-z.exists("/test") do
-  puts "callback!!!"
-end
+z.create("/test", "foo", Zookeeper::EPHEMERAL)
+z.exists("/test")
 puts "now changing it"
 z.set("/test", "bar", 0)
 sleep 1
 puts "did the watcher say something?"
 
-puts "let's try using a lock"
-z.try_acquire("/test_lock", "this is the content of the lock file") do |have_lock|
-  puts have_lock ? "we have the lock!" : "failed to obtain lock :("
-  if have_lock
-    puts "sleeping"
-    sleep 5
-  end
-end
+#puts "let's try using a lock"
+#z.try_acquire("/test_lock", "this is the content of the lock file") do |have_lock|
+#  puts have_lock ? "we have the lock!" : "failed to obtain lock :("
+#  if have_lock
+#    puts "sleeping"
+#    sleep 5
+#  end
+#end
 puts "done with locking..."
 

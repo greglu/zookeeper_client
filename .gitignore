@@ -4,3 +4,5 @@
 *~
 *.log
 Makefile
+.loadpath
+.project

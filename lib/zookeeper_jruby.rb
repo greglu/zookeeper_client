@@ -1,8 +1,9 @@
 include Java
 #Dir["/home/greg/Code/zookeeper-3.2.2/lib/**/*.jar"].each{|f| require f}
+
+require '/home/greg/Code/zookeeper-3.2.2/lib/log4j-1.2.15.jar'
 require '/home/greg/Code/zookeeper-3.2.2/zookeeper-3.2.2.jar'
 
-#require '/home/greg/Code/zookeeper-3.2.2/lib/log4j-1.2.15.jar'
 #import org.apache.log4j.Logger
 #import org.apache.log4j.PropertyConfigurator
 #PropertyConfigurator.configure("/home/greg/Code/zookeeper-3.2.2/conf/log4j.properties")
@@ -22,7 +23,7 @@ class Java::OrgApacheZookeeperData::Stat
 end
 
 class Zookeeper < Java::OrgApacheZookeeper::ZooKeeper
-
+  java_import org.apache.zookeeper.KeeperException
   java_import org.apache.zookeeper.CreateMode
   java_import org.apache.zookeeper.data.ACL
   java_import org.apache.zookeeper.data.Id
@@ -66,10 +67,10 @@ class Zookeeper < Java::OrgApacheZookeeper::ZooKeeper
   end
   alias_method :get, :getData
 
-  def getChildren(path)
+  def get_children(path)
     super(path, false).to_a
   end
-  alias_method :list, :getChildren
+  alias_method :list, :get_children
 
   def try_acquire(path, value)
   end
